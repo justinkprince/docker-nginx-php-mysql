@@ -2,13 +2,14 @@
 .*.swp
 .DS_Store
 
-# Application
-web/app/composer.json
-
 # PHPStorm
 .idea/**/workspace.xml
 .idea/**/tasks.xml
 .idea/dictionaries
+
+# Application
+data/
+etc/ssl/
 
 # Netbeans
 nbproject/

@@ -23,27 +23,27 @@ help:
 	@echo "  test                Test application"
 
 init:
-	@$(shell cp -n $(shell pwd)/web/app/composer.json.dist $(shell pwd)/web/app/composer.json 2> /dev/null)
+	@$(shell cp -n $(shell pwd)/app/composer.json.dist $(shell pwd)/app/composer.json 2> /dev/null)
 
 apidoc:
-	@docker-compose exec -T php ./app/vendor/bin/apigen generate app/src --destination app/doc
+	@docker-compose exec -T php ./vendor/bin/apigen generate src --destination doc
 	@make resetOwner
 
 clean:
 	@rm -Rf data/db/mysql/*
 	@rm -Rf $(MYSQL_DUMPS_DIR)/*
-	@rm -Rf web/app/vendor
-	@rm -Rf web/app/composer.lock
-	@rm -Rf web/app/doc
-	@rm -Rf web/app/report
+	@rm -Rf app/vendor
+	@rm -Rf app/composer.lock
+	@rm -Rf app/doc
+	@rm -Rf app/report
 	@rm -Rf etc/ssl/*
 
 code-sniff:
 	@echo "Checking the standard code..."
-	@docker-compose exec -T php ./app/vendor/bin/phpcs --standard=PSR2 app/src
+	@docker-compose exec -T php ./vendor/bin/phpcs --standard=PSR2 src
 
 composer-up:
-	@docker run --rm -v $(shell pwd)/web/app:/app composer update
+	@docker run --rm -v $(shell pwd)/app:/app composer update
 
 docker-start: init
 	docker-compose up -d
@@ -67,10 +67,10 @@ mysql-restore:
 	@docker exec -i $(shell docker-compose ps -q mysqldb) mysql -u"$(MYSQL_ROOT_USER)" -p"$(MYSQL_ROOT_PASSWORD)" < $(MYSQL_DUMPS_DIR)/db.sql 2>/dev/null
 
 test: code-sniff
-	@docker-compose exec -T php ./app/vendor/bin/phpunit --colors=always --configuration ./app/
+	@docker-compose exec -T php ./vendor/bin/phpunit --colors=always --configuration ./
 	@make resetOwner
 
 resetOwner:
-	@$(shell chown -Rf $(SUDO_USER):$(shell id -g -n $(SUDO_USER)) $(MYSQL_DUMPS_DIR) "$(shell pwd)/etc/ssl" "$(shell pwd)/web/app" 2> /dev/null)
+	@$(shell chown -Rf $(SUDO_USER):$(shell id -g -n $(SUDO_USER)) $(MYSQL_DUMPS_DIR) "$(shell pwd)/etc/ssl" "$(shell pwd)/app" 2> /dev/null)
 
 .PHONY: clean test code-sniff init
